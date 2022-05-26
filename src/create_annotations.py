@@ -30,7 +30,7 @@ def create_sub_masks(mask_image, width, height):
     return sub_masks
 
 
-def create_sub_mask_annotation(sub_mask):
+def create_sub_mask_annotation(sub_mask):  # ref: https://github.com/akTwelve/cocosynth/blob/3909837290ab3511ff03ffe57ae870c929bd40a0/python/coco_json_utils.py#L151
     # Find contours (boundary lines) around each sub-mask
     # Note: there could be multiple contours if the object
     # is partially occluded. (E.g. an elephant behind a tree)
@@ -49,14 +49,26 @@ def create_sub_mask_annotation(sub_mask):
         poly = Polygon(contour)
         poly = poly.simplify(1.0, preserve_topology=False)
 
-        if (poly.is_empty):
-            # Go to next iteration, dont save empty values in list
+        # if (poly.area > 5):  # Ignore tiny polygons
+        if (poly.geom_type == 'MultiPolygon'):
+            # if MultiPolygon, take the smallest convex Polygon containing all the points in the object
+            poly = poly.convex_hull
+
+        if (poly.geom_type == 'Polygon'):  # Ignore if still not a Polygon (could be a line or point)
+            polygons.append(poly)
+            segmentation = np.array(poly.exterior.coords).ravel().tolist()
+            segmentations.append(segmentation)
+
+        # if not poly.is_empty:
+        #     polygons.append(poly)
+        #     segmentation = np.array(poly.exterior.coords).ravel().tolist()
+        #     segmentations.append(segmentation)
+        if len(polygons) == 0:
+            # This item doesn't have any visible polygons, ignore it
+            # (This can happen if a randomly placed foreground is covered up
+            #  by other foregrounds)
             continue
 
-        polygons.append(poly)
-
-        segmentation = np.array(poly.exterior.coords).ravel().tolist()
-        segmentations.append(segmentation)
 
     return polygons, segmentations
 

@@ -2,35 +2,22 @@ import glob
 
 from src.create_annotations import *
 from src.coco_viewer import CocoDataset
+# from src.coco_to_yolo import COCO2YOLO
 
 # Label ids of the dataset
 category_ids = {
-    "outlier": 0,
-    "object1": 1,
-    "object2": 2,
-    "object3": 3,
-    "object4": 4,
-    "object5": 5,
-    "object6": 6,
-    "object7": 7,
-    "object8": 8
+    "bg": 0,
+    "crack": 1,
 }
 
 # Define which colors match which categories in the images
 category_colors = {
-    "(0, 0, 0)": 0,  # Outlier
-    "(255, 0, 0)": 1,  # object1
-    "(255, 255, 0)": 2,  # object2
-    "(128, 0, 255)": 3,  # object3
-    "(255, 128, 0)": 4,  # object4
-    "(0, 0, 255)": 5,  # object5
-    "(128, 255, 255)": 6,  # object6
-    "(0, 255, 0)": 7,  # object7
-    "(128, 128, 128)": 8  # object8
+    "(0, 0, 0)": 0,  # object0
+    "(255, 255, 255)": 1,  # object2
 }
 
 # Define the ids that are a multiplolygon. for example: wall, roof and sky
-multipolygon_ids = [2, 5, 6]
+multipolygon_ids = [0]#, 1, 2,3]
 
 
 # Get "images" and "annotations" info
@@ -102,6 +89,7 @@ if __name__ == "__main__":
 
         print("Created %d annotations for images in folder: %s" % (annotation_cnt, mask_path))
 
+
 # View the results
 instances_json_path = "output/train.json"
 images_path = "dataset/train"
@@ -114,5 +102,8 @@ html = coco_dataset.display_image(0)
 f = open('html.html', 'w')
 f.write(html)
 f.close()
+
+print("html created!")
+# convert COCO to YOLO file
 
 # IPython.display.HTML(html)
