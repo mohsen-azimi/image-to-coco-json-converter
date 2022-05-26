@@ -1,5 +1,4 @@
 import glob
-
 from src.create_annotations import *
 from src.coco_viewer import CocoDataset
 # from src.coco_to_yolo import COCO2YOLO
@@ -90,20 +89,20 @@ if __name__ == "__main__":
         print("Created %d annotations for images in folder: %s" % (annotation_cnt, mask_path))
 
 
-# View the results
-instances_json_path = "output/train.json"
-images_path = "dataset/train"
-coco_dataset = CocoDataset(instances_json_path, images_path)
-coco_dataset.display_info()
-coco_dataset.display_licenses()
-coco_dataset.display_categories()
-
-html = coco_dataset.display_image(0)
-f = open('html.html', 'w')
-f.write(html)
-f.close()
-
-print("html created!")
-# convert COCO to YOLO file
+# # View the results
+# instances_json_path = "output/train.json"
+# images_path = "dataset/train"
+# coco_dataset = CocoDataset(instances_json_path, images_path)
+# coco_dataset.display_info()
+# coco_dataset.display_licenses()
+# coco_dataset.display_categories()
+#
+# html = coco_dataset.display_image(0)
+# f = open('html.html', 'w')
+# f.write(html)
+# f.close()
+#
+# print("html created!")
+# # convert COCO to YOLO file
 
 # IPython.display.HTML(html)
