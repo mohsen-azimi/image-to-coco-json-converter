@@ -1,4 +1,4 @@
-from PIL import Image 
+from PIL import Image
 import numpy as np
 from skimage import measure
 from shapely.geometry import Polygon, MultiPolygon
@@ -14,7 +14,6 @@ def create_sub_masks(mask_image, width, height):
             # Get the RGB values of the pixel
             pixel = mask_image.getpixel((x, y))[:3]
 
-
             # If the pixel is not black...
 
             if pixel != (0, 0, 0):
@@ -22,18 +21,19 @@ def create_sub_masks(mask_image, width, height):
                 pixel_str = str(pixel)
                 sub_mask = sub_masks.get(pixel_str)
                 if sub_mask is None:
-                   # Create a sub-mask (one bit per pixel) and add to the dictionary
+                    # Create a sub-mask (one bit per pixel) and add to the dictionary
                     # Note: we add 1 pixel of padding in each direction
                     # because the contours module doesn't handle cases
                     # where pixels bleed to the edge of the image
-                    sub_masks[pixel_str] = Image.new('1', (width+2, height+2))
+                    sub_masks[pixel_str] = Image.new('1', (width + 2, height + 2))
 
                 # Set the pixel value to 1 (default is 0), accounting for padding
-                sub_masks[pixel_str].putpixel((x+1, y+1), 1)
+                sub_masks[pixel_str].putpixel((x + 1, y + 1), 1)
     return sub_masks
 
 
-def create_sub_mask_annotation(sub_mask):  # ref: https://github.com/akTwelve/cocosynth/blob/3909837290ab3511ff03ffe57ae870c929bd40a0/python/coco_json_utils.py#L151
+def create_sub_mask_annotation(
+        sub_mask):  # ref: https://github.com/akTwelve/cocosynth/blob/3909837290ab3511ff03ffe57ae870c929bd40a0/python/coco_json_utils.py#L151
     # Find contours (boundary lines) around each sub-mask
     # Note: there could be multiple contours if the object
     # is partially occluded. (E.g. an elephant behind a tree)
@@ -41,36 +41,6 @@ def create_sub_mask_annotation(sub_mask):  # ref: https://github.com/akTwelve/co
 
     polygons = []
     segmentations = []
-    # for contour in contours:
-    #     # Flip from (row, col) representation to (x, y)
-    #     # and subtract the padding pixel
-    #     for i in range(len(contour)):
-    #         row, col = contour[i]
-    #         contour[i] = (col - 1, row - 1)
-    #
-    #     # Make a polygon and simplify it
-    #     poly = Polygon(contour)
-    #     poly = poly.simplify(1.0, preserve_topology=False)
-    #
-    #     # if (poly.area > 5):  # Ignore tiny polygons
-    #     if (poly.geom_type == 'MultiPolygon'):
-    #         # if MultiPolygon, take the smallest convex Polygon containing all the points in the object
-    #         poly = poly.convex_hull
-    #
-    #     if (poly.geom_type == 'Polygon'):  # Ignore if still not a Polygon (could be a line or point)
-    #         polygons.append(poly)
-    #         segmentation = np.array(poly.exterior.coords).ravel().tolist()
-    #         segmentations.append(segmentation)
-    #
-    #     # if not poly.is_empty:
-    #     #     polygons.append(poly)
-    #     #     segmentation = np.array(poly.exterior.coords).ravel().tolist()
-    #     #     segmentations.append(segmentation)
-    #     if len(polygons) == 0:
-    #         # This item doesn't have any visible polygons, ignore it
-    #         # (This can happen if a randomly placed foreground is covered up
-    #         #  by other foregrounds)
-    #         continue
 
     for contour in contours:
         # Flip from (row, col) representation to (x, y)
@@ -82,9 +52,31 @@ def create_sub_mask_annotation(sub_mask):  # ref: https://github.com/akTwelve/co
         # Make a polygon and simplify it
         poly = Polygon(contour)
         poly = poly.simplify(1.0, preserve_topology=False)
-        polygons.append(poly)
-        segmentation = np.array(poly.exterior.coords).ravel().tolist()
-        segmentations.append(segmentation)
+
+        if poly.area > 5:  # Ignore tiny polygons
+            if poly.geom_type == 'MultiPolygon':
+                # if MultiPolygon, take the smallest convex Polygon containing all the points in the object
+                poly = poly.convex_hull
+
+            if poly.geom_type == 'Polygon':  # Ignore if still not a Polygon (could be a line or point)
+                polygons.append(poly)
+                segmentation = np.array(poly.exterior.coords).ravel().tolist()
+                segmentations.append(segmentation)
+
+            # if not poly.is_empty:
+            #     polygons.append(poly)
+            #     segmentation = np.array(poly.exterior.coords).ravel().tolist()
+            #     segmentations.append(segmentation)
+            if len(polygons) == 0:
+                # This item doesn't have any visible polygons, ignore it
+                # (This can happen if a randomly placed foreground is covered up
+                #  by other foregrounds)
+                continue
+
+        #
+        # polygons.append(poly)
+        # segmentation = np.array(poly.exterior.coords).ravel().tolist()
+        # segmentations.append(segmentation)
 
     return polygons, segmentations
 

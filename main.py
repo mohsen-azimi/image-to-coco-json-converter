@@ -30,8 +30,9 @@ def images_annotations_info(maskpath):
     for mask_image in glob.glob(maskpath + "*.png"):
         # The mask image is *.png but the original image is *.jpg.
         # We make a reference to the original file in the COCO JSON file
-        original_file_name = os.path.basename(mask_image).split(".")[0] + ".jpg"
 
+        original_file_name = os.path.basename(mask_image).split(".")[0] + ".jpg"
+        print(original_file_name)
         # Open the image and (to be sure) we convert it to RGB
         mask_image_open = Image.open(mask_image).convert("RGB")
         w, h = mask_image_open.size
@@ -60,7 +61,7 @@ def images_annotations_info(maskpath):
                 for i in range(len(polygons)):
                     # Cleaner to recalculate this variable
                     segmentation = [np.array(polygons[i].exterior.coords).ravel().tolist()]
-
+                    print(i)
                     annotation = create_annotation_format(polygons[i], segmentation, image_id, category_id,
                                                           annotation_id)
 
@@ -85,6 +86,7 @@ if __name__ == "__main__":
 
         with open("output/{}.json".format(keyword), "w") as outfile:
             json.dump(coco_format, outfile)
+
 
         print("Created %d annotations for images in folder: %s" % (annotation_cnt, mask_path))
 
