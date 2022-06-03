@@ -2,9 +2,9 @@ import cv2
 import glob
 import numpy as np
 
-train_val_split = [.8, .2]
+# train_val_split = [.8, .2]
 index = 0
-for file in glob.glob('..\shm-data-hub\Crack Detection\Ozgenel\BW/*.jpg'):
+for file in glob.glob('..\shm-data-hub\crack_detection\Ozgenel\BW/*.jpg'):
     index += 1
 
     grayImage = cv2.imread(file, cv2.IMREAD_GRAYSCALE) # read in grayscale mode
@@ -25,12 +25,8 @@ for file in glob.glob('..\shm-data-hub\Crack Detection\Ozgenel\BW/*.jpg'):
     # cv2.imshow("1",img[:,:,0])
     # cv2.imshow("2",img[:,:,1])
     # cv2.imshow("mask",mask2)
-    print(str(index/len(glob.glob('..\shm-data-hub\Crack Detection\Ozgenel\BW/*.jpg')) ) + '--|--' + file[-7:])
-
-    if index/len(glob.glob('..\shm-data-hub\Crack Detection\Ozgenel\BW/*.jpg'))<train_val_split[0]:
-        cv2.imwrite('dataset/train_mask/'+file[-7:-3]+'.png', mask2)
-    else:
-        cv2.imwrite('dataset/val_mask/'+file[-7:-3]+'.png', mask2)
+    print(file[-7:])
+    cv2.imwrite('dataset/mask_png/'+file[-7:-4]+'.png', mask2)
 
 
     # cv2.waitKey(0)

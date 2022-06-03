@@ -5,14 +5,12 @@ from src.coco_viewer import CocoDataset
 
 # Label ids of the dataset
 category_ids = {
-    "bg": 0,
-    "crack": 1,
+    "crack": 0,
 }
 
 # Define which colors match which categories in the images
 category_colors = {
-    "(0, 0, 0)": 0,  # object0
-    "(255, 255, 255)": 1,  # object2
+    "(255, 255, 255)": 0,  # crack
 }
 
 # Define the ids that are a multiplolygon. for example: wall, roof and sky
@@ -75,17 +73,16 @@ if __name__ == "__main__":
     # Get the standard COCO JSON format
     coco_format = get_coco_json_format()
 
-    for keyword in ["train", "val"]:
-        mask_path = "dataset/{}_mask/".format(keyword)
+    mask_path = "dataset/_mask_png/"
 
-        # Create category section
-        coco_format["categories"] = create_category_annotation(category_ids)
+    # Create category section
+    coco_format["categories"] = create_category_annotation(category_ids)
 
-        # Create images and annotations sections
-        coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(mask_path)
+    # Create images and annotations sections
+    coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(mask_path)
 
-        with open("output/{}.json".format(keyword), "w") as outfile:
-            json.dump(coco_format, outfile)
+    with open("output/coco_annotations_val.json", "w") as outfile:
+        json.dump(coco_format, outfile)
 
 
         print("Created %d annotations for images in folder: %s" % (annotation_cnt, mask_path))
